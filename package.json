@@ -1,23 +1,24 @@
 {
   "name": "talent-iq",
   "version": "1.0.0",
-  "description": "",
+  "description": "AI-powered interview preparation platform",
   "main": "index.js",
   "engines": {
     "node": "20.x"
   },
   "scripts": {
     "build": "npm install --prefix backend && npm install --prefix frontend && npm run build --prefix frontend",
-    "start": "npm run start --prefix backend & npm run start --prefix frontend"
+    "start": "npm run start --prefix backend",
+    "dev": "concurrently \"npm run dev --prefix backend\" \"npm run dev --prefix frontend\"",
+    "install:all": "npm install --prefix backend && npm install --prefix frontend"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/meryemgkrt/talent-IQ.git"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": ["interview", "AI", "talent", "recruitment"],
+  "author": "Meryem",
   "license": "ISC",
-  "type": "commonjs",
   "bugs": {
     "url": "https://github.com/meryemgkrt/talent-IQ/issues"
   },
