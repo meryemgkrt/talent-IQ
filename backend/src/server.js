@@ -10,7 +10,7 @@ const __dirname = path.resolve();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// API Routes
+// API Routes (static middleware'den ÖNCE tanımla)
 app.get('/health', (req, res) => {
   res.status(200).json({ msg: 'Hello, World! Server is up and running.' });
 });
@@ -19,15 +19,21 @@ app.get('/books', (req, res) => {
   res.status(200).json({ msg: 'List of books will be here.' });
 });
 
-// Production için static dosyalar
+// Production için static dosyalar ve SPA routing
 if (ENV.NODE_ENV === 'production') {
   const frontendPath = path.join(__dirname, '../../frontend/dist');
   
+  // Static dosyalar
   app.use(express.static(frontendPath));
 
-  // Catch-all route - Express 5 syntax
-  app.get('*', (req, res) => {  // ✅ /* yerine *
-    res.sendFile(path.join(frontendPath, 'index.html'));
+  // SPA için fallback - Express 5 syntax
+  app.use((req, res, next) => {
+    // Eğer dosya yoksa index.html'e yönlendir
+    if (!req.path.includes('.')) {
+      res.sendFile(path.join(frontendPath, 'index.html'));
+    } else {
+      next();
+    }
   });
 }
 
