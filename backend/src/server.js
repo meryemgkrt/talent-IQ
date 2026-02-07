@@ -25,7 +25,8 @@ if (ENV.NODE_ENV === 'production') {
   
   app.use(express.static(frontendPath));
 
-  app.get('/*', (req, res) => {
+  // Catch-all route - Express 5 syntax
+  app.get('*', (req, res) => {  // ✅ /* yerine *
     res.sendFile(path.join(frontendPath, 'index.html'));
   });
 }
