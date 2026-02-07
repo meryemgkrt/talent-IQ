@@ -6,7 +6,7 @@ import { connectDB } from './lib/db.js';
 
 const app = express();
 
-// ES Module için __dirname alternatifi
+// ES Module için __dirname
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -14,11 +14,11 @@ const __dirname = path.dirname(__filename);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Debug Logs
+// Debug
 console.log('🔍 NODE_ENV:', ENV.NODE_ENV);
 console.log('🔍 __dirname:', __dirname);
 
-// API Routes (static middleware'den ÖNCE tanımla)
+// API Routes
 app.get('/health', (req, res) => {
   res.status(200).json({ msg: 'Hello, World! Server is up and running.' });
 });
@@ -27,28 +27,17 @@ app.get('/books', (req, res) => {
   res.status(200).json({ msg: 'List of books will be here.' });
 });
 
-// Production için static dosyalar ve SPA routing
+// Production: Static files + SPA routing
 if (ENV.NODE_ENV === 'production') {
-  // Path: /app/backend/src -> /app/frontend/dist
   const frontendPath = path.join(__dirname, '../../frontend/dist');
   
   console.log('📁 Frontend Path:', frontendPath);
   
-  // Static dosyalar
-  app.use(express.static(frontendPath, {
-    maxAge: '1d',
-    index: false // index.html'i otomatik serve etme
-  }));
+  app.use(express.static(frontendPath));
 
-  // SPA için fallback
+  // Catch-all route (Express 4 ile çalışır)
   app.get('*', (req, res) => {
-    console.log('🔄 Fallback route triggered:', req.path);
-    res.sendFile(path.join(frontendPath, 'index.html'), (err) => {
-      if (err) {
-        console.error('❌ Error sending index.html:', err);
-        res.status(500).send('Internal Server Error');
-      }
-    });
+    res.sendFile(path.join(frontendPath, 'index.html'));
   });
 }
 
@@ -61,7 +50,6 @@ const startServer = async () => {
     app.listen(PORT, () => {
       console.log(`✅ Server is running on port ${PORT}`);
       console.log(`✅ Environment: ${ENV.NODE_ENV || 'development'}`);
-      console.log(`🌐 Access URL: http://localhost:${PORT}`);
     });
   } catch (error) {
     console.error('❌ Failed to start the server:', error);
