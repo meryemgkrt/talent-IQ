@@ -6,20 +6,27 @@ import { connectDB } from './lib/db.js';
 const app = express();
 const __dirname = path.resolve();
 
+// Middleware
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+// API Routes
 app.get('/health', (req, res) => {
-  res.status(200).json({msg:'Hello, World! Server is up and running.'});
+  res.status(200).json({ msg: 'Hello, World! Server is up and running.' });
 });
 
 app.get('/books', (req, res) => {
-  res.status(200).json({msg:'List of books will be here.'});
+  res.status(200).json({ msg: 'List of books will be here.' });
 });
 
 // Production için static dosyalar
 if (ENV.NODE_ENV === 'production') {
-  app.use(express.static(path.join(__dirname, '../frontend/dist')));
+  const frontendPath = path.join(__dirname, '../../frontend/dist');
+  
+  app.use(express.static(frontendPath));
 
-  app.get('/*', (req, res) => {  // /{*any} değil, /* olmalı
-    res.sendFile(path.join(__dirname, '../frontend/dist/index.html'));
+  app.get('/*', (req, res) => {
+    res.sendFile(path.join(frontendPath, 'index.html'));
   });
 }
 
@@ -27,14 +34,16 @@ const startServer = async () => {
   try {
     await connectDB();
     
-    app.listen(ENV.PORT, () => {
-      console.log(`Server is running on port ${ENV.PORT}`);
+    const PORT = ENV.PORT || 8080;
+    
+    app.listen(PORT, () => {
+      console.log(`✅ Server is running on port ${PORT}`);
+      console.log(`✅ Environment: ${ENV.NODE_ENV || 'development'}`);
     });
   } catch (error) {
-    console.error('Failed to start the server:', error);
-    process.exit(1); // Hata durumunda process'i sonlandır
+    console.error('❌ Failed to start the server:', error);
+    process.exit(1);
   }
-}
-
+};
 
 startServer();
